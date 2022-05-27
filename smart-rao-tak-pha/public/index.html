@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<title>Smart Rao-Tak-Pha</title>
+<!--<link rel="shortcut icon" href="https://IMG/eeeg.ico">  -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+
+<style>
+	body {font-family: "Poppins", sans-serif}
+	h1,h2,h3,h4,h5,h6 {
+	    font-family: "Playfair Display";
+	    letter-spacing: 5px;
+	    text-align: center;
+	}
+</style>
+
+<body>
+	<!-- Navbar (sit on top) -->
+	<div class="w3-top">
+	  <div class="w3-bar w3-white w3-wide w3-padding-8 w3-card-2">
+	    <a href="#home" class="w3-bar-item w3-button w3-margin-left">SMART</a>
+	    <div class="w3-right w3-hide-small">
+	      <a href="#Dashboard" class="w3-bar-item w3-button w3-margin-right">RAO-TAK-PHA</a>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- Header -->
+	<header class="w3-display-container w3-content w3-wide" style="max-width:1600px;min-width:500px" id="home"> 
+		<div class="w3-display-bottomleft w3-padding-xlarge w3-opacity">
+	    	<h1 class="w3-xxlarge">Electrical Engineering Enterprise Group</h1>
+	  	</div>
+	</header>
+
+	<!-- Page content -->.
+	<!-- Firebase -->
+	
+	<!--<script src = "script.js"></script>-->
+	<!-- Str.Dashboard Section -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+		<div class="w3-container w3-padding-64 " id="Dashboard">
+		<h3>SMART</h3>
+		<h3><i class="fa fa-rss" aria-hidden="true"></i> RAO-TAK-PHA</h3>
+			<h3 class="w3-center w3-light-grey w3-padding-24"><span id = "warning"style="color:black;font-weight:bold" >WARNING</span></h3>
+      		<h3>LIGHT INTENSITY= <span id="LIGHT" style="color:black;font-weight:bold">LIGHT</span> <hr></h3>
+            <h3>HUMIDITY = <span id="HUMD" style="color:black;font-weight:bold">HUMIDITY</span> <hr></h3>
+			<h3 class="w3-center w3-grey w3-padding-24"><button type = "button" id = "btn" class = "w3-btn-bar" style = "background-color: #85F9BF;">ON</button></h3>
+
+		</div>
+
+	<script type = "module">
+		// Import the functions you need from the SDKs you need
+		import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+		import { getFirestore, collection, getDocs, onSnapshot ,doc } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-firestore.js";
+		import {getDatabase, ref, onValue, set} from "https://www.gstatic.com/firebasejs/9.8.1/firebase-database.js"
+		
+		// TODO: Add SDKs for Firebase products that you want to use
+		// https://firebase.google.com/docs/web/setup#available-libraries
+	  
+		// Your web app's Firebase configuration
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+		  apiKey: "AIzaSyBm59oYi0gatTUGpMQk__XaRMmEzYJMWII",
+		  authDomain: "embedded-lab-c677b.firebaseapp.com",
+		  databaseURL: "https://embedded-lab-c677b-default-rtdb.asia-southeast1.firebasedatabase.app",
+		  projectId: "embedded-lab-c677b",
+		  storageBucket: "embedded-lab-c677b.appspot.com",
+		  messagingSenderId: "491635712787",
+		  appId: "1:491635712787:web:e38af90e9de7cef830f0e6",
+		  measurementId: "G-JWTBL9YL1H"
+		};
+	  
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+		const database = getDatabase(app);
+
+		var State1_1 = document.getElementById("LIGHT");
+		var State1_2 = document.getElementById("HUMD");
+		var warn = document.getElementById("warning");
+		var btnState = document.getElementById("btn");
+       // var db_refState = firebase.database().ref().child("DHT11");
+	   //var db_refState = ref(database, "IOT/DHT11");
+	   var db_refState = ref(database, "IOT");
+	   var db_btnState = ref(database, "state");
+		//console.log(db_refState.child("TEMP").val);
+        onValue(db_refState, snapshot => {
+			var humd, light;
+			snapshot.child("BH1750FVI").child("LIGHT").forEach(function(element){
+				State1_1.innerText = element.val().toString() + "  lux";
+				light = parseInt(element.val());
+				//console.log(element.val());
+			});
+			snapshot.child("DHT11").child("HUMD").forEach(function(element){
+				State1_2.innerText = element.val().toString() + " %";
+				humd = parseInt(element.val());
+			});
+
+			if (light < 500 && humd < 75){
+				warn.innerText = "HURRY UP! IT'S GOING TO RAIN";
+			}else{
+				warn.innerText = "APPROPRIATE TIME FOR DRYING CLOTHES";
+			}			
+	    });
+		/*function writeUserData() {
+			if (btnState.innerText == "TURN ON"){
+				set(ref(database, 'state'), {
+    				state1 : "1"
+  				});
+			}else{
+				set(ref(database, 'state'), {
+    				state1 : "0"
+  				});
+			}
+		}*/
+		document.querySelector("#btn").addEventListener('click',()=>{
+			if (btnState.innerText == "ON"){
+				document.getElementById("btn").innerHTML = "OFF";
+				set(ref(database, 'state'), {
+    				state1 : "0"
+  				});
+				document.getElementById("btn").style.backgroundColor = "#F799AC";
+			}else{
+				document.getElementById("btn").innerHTML="ON";
+				set(ref(database, 'state'), {
+    				state1 : "1"
+  				});
+				document.getElementById("btn").style.backgroundColor = "#85F9BF";
+			}
+		})
+		
+		
+	</script>
+	
+	<!-- Footer -->
+	<!--
+	<footer class="w3-center w3-light-grey w3-padding-32">
+	  <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
+	  <p>Developed by Electrical Engineering Enterprise Group</p>
+	</footer> -->
+</body>
+
+</html>
+
+
