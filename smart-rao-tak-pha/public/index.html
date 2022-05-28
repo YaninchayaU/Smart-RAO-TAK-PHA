@@ -97,7 +97,7 @@
 				humd = parseInt(element.val());
 			});
 
-			if (light < 500 && humd < 75){
+			if (light < 500 && humd > 75){
 				warn.innerText = "HURRY UP! IT'S GOING TO RAIN";
 			}else{
 				warn.innerText = "APPROPRIATE TIME FOR DRYING CLOTHES";
